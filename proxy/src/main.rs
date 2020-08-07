@@ -49,7 +49,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             panic!();
         });
 
-    let ws_conn_string = format!("ws://127.0.0.1:{}", app_port);
+    let ws_conn_string = format!("wss://127.0.0.1:{}", app_port);
     info!("Ws conn string: {}", &ws_conn_string);
 
     let auth_header_data = format!("riot:{}", &remoting_auth_token);
