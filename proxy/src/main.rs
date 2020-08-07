@@ -59,8 +59,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let tungstenite_req = tungstenite::http::Request::builder()
         .uri(ws_conn_string)
         .header(tungstenite::http::header::AUTHORIZATION, auth_header)
-        .body(())?;
-    let (mut ws, res) = tungstenite::connect(tungstenite_req)?;
+        .body(())
+        .unwrap_or_else(|err| {
+            error!("Building ws request failed: {}", err);
+            panic!();
+        });
+    let (mut ws, res) = tungstenite::connect(tungstenite_req).unwrap_or_else(|err| {
+        error!("Failed to connect to server: {}", err);
+        panic!();
+    });
     info!("Connected to ws");
 
     ws.write_message(tungstenite::Message::Text("Hello, world!".to_string()))?;
