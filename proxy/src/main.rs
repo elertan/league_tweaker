@@ -2,7 +2,6 @@ use futures::future::Future;
 use futures::prelude::*;
 use std::env;
 use tokio::runtime::Builder;
-use websocket::ClientBuilder;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -40,13 +39,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let auth_header_data = format!("riot:{}", &remoting_auth_token);
     let auth_header = format!("Basic {}", base64::encode(auth_header_data));
 
-    let mut headers = websocket::header::Headers::new();
-    headers.set(websocket::header::Authorization(auth_header));
-    let client = ClientBuilder::new(ws_conn_string.as_str())?
-        .custom_headers(&headers)
-        .connect_insecure()
-        .unwrap();
-    let (sink, stream) = client.split().unwrap();
+    let tungstenite_req = tungstenite::http::Request::builder()
+        .uri(ws_conn_string)
+        .header(tungstenite::http::header::AUTHORIZATION, auth_header)
+        .body(())?;
+    let (ws, res) = tungstenite::connect(tungstenite_req)?;
 
     Ok(())
 }
