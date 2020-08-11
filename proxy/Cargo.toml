@@ -10,7 +10,7 @@ edition = "2018"
 tokio = { version = "0.2.22", features = ["macros"] }
 futures = "0.3.5"
 base64 = "0.12.3"
-async-tungstenite = "0.8.0"
+async-tungstenite = { version = "0.8.0", features = ["async-tls", "async-std-runtime"]}
 log = "0.4.11"
 simple-logging = "2.0.2"
 actix-web = { version = "2.0", features = ["rustls"] }

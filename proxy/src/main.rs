@@ -285,17 +285,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .bind_rustls(addr, rustls_config)
         .expect("Bind failed")
         .run()
-        .await
-    };
-    // futures::future::try_join(http_proxy_fut, fut2).await?;
+        .await;
 
-    let ws_conn_string = format!("wss://127.0.0.1:{}", app_port);
-    info!("Ws conn string: {}", &ws_conn_string);
-    //
-    let auth_header_data = format!("riot:{}", &remoting_auth_token);
-    let auth_header = format!("Basic {}", base64::encode(auth_header_data));
-    info!("Auth header: {}", &auth_header);
-    //
+        ()
+    };
+    let websocket_fut = async move {
+        let ws_conn_string = format!("wss://127.0.0.1:{}", app_port);
+        info!("Ws conn string: {}", &ws_conn_string);
+        //
+        let auth_header_data = format!("riot:{}", &remoting_auth_token);
+        let auth_header = format!("Basic {}", base64::encode(auth_header_data));
+        info!("Auth header: {}", &auth_header);
+
+        let (ws_stream, _) = async_tungstenite::async_std::connect_async(ws_conn_string)
+            .await
+            .unwrap_or_else(|err| {
+                error!("Couldnt connect ws: '{}'", err);
+                panic!();
+            });
+
+        ()
+    };
     // let tungstenite_req = tungstenite::http::Request::builder()
     //     .uri(ws_conn_string)
     //     .header(tungstenite::http::header::AUTHORIZATION, auth_header)
@@ -312,7 +322,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //
     // ws.write_message(tungstenite::Message::Text("Hello, world!".to_string()))?;
 
-    proxy_fut.await?;
+    futures::future::join(proxy_fut, websocket_fut).await;
+    // proxy_fut.await?;
     info!("Finished");
     Ok(())
 }
