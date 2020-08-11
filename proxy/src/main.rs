@@ -3,10 +3,19 @@ extern crate log;
 
 use actix_web::{web, App, Error, HttpRequest, HttpResponse, HttpServer, Responder};
 use actix_web_actors::ws;
+use once_cell::sync::OnceCell;
 use std::env;
 use std::io::BufReader;
 use std::net::IpAddr;
 use std::str::FromStr;
+use std::sync::Mutex;
+
+struct AppData {
+    pub remoting_auth_token: String,
+    pub app_port: u32,
+}
+
+static APP_DATA: OnceCell<AppData> = OnceCell::new();
 
 #[actix_rt::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -101,15 +110,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         //             .as_ref(),
         //     )
         //     .unwrap();
-        // builder
-        //     .set_serial_number(
-        //         openssl::asn1::Asn1Integer::from_bn(
-        //             openssl::bn::BigNum::from_u32(97).unwrap().as_ref(),
-        //         )
-        //         .unwrap()
-        //         .as_ref(),
-        //     )
-        //     .unwrap();
+        builder
+            .set_serial_number(
+                openssl::asn1::Asn1Integer::from_bn(
+                    openssl::bn::BigNum::from_u32(97).unwrap().as_ref(),
+                )
+                .unwrap()
+                .as_ref(),
+            )
+            .unwrap();
         builder.set_pubkey(&pkey).unwrap();
         builder
             .sign(&pkey, openssl::hash::MessageDigest::sha256())
@@ -173,9 +182,48 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
     info!("LCU app port: {}", &app_port);
 
+    APP_DATA
+        .set(AppData {
+            app_port,
+            remoting_auth_token,
+        })
+        .unwrap_or_else(|_| panic!());
+
     let proxy_fut = async move {
         async fn proxy_http(req: HttpRequest) -> impl Responder {
-            "Hello, world!"
+            let mut request_headers = http::HeaderMap::new();
+
+            for header in req.headers() {
+                let header_name = header.0.to_owned();
+                let header_value = http::HeaderValue::from_str(header.1.to_str().unwrap()).unwrap();
+                request_headers.insert(header_name, header_value);
+            }
+
+            let client = reqwest::Client::builder()
+                .danger_accept_invalid_certs(true)
+                // .danger_accept_invalid_hostnames(true)
+                .default_headers(request_headers)
+                .build()
+                .unwrap();
+            let request_method = reqwest::Method::from_str(req.method().as_str()).unwrap();
+            let path = req.uri().path_and_query().unwrap().as_str();
+            let port = APP_DATA.get().unwrap().app_port;
+            let url = format!("https://127.0.0.1:{}{}", port, path);
+            info!("url: {}", &url);
+            let res = client
+                .request(request_method, url.as_str())
+                .send()
+                .await
+                .unwrap();
+            let mut response_builder = HttpResponse::build(
+                actix_web::http::StatusCode::from_u16(res.status().as_u16()).unwrap(),
+            );
+            for header in res.headers() {
+                let header_name = header.0.as_str();
+                let header_value = header.1.to_str().unwrap();
+                response_builder.set_header(header_name, header_value);
+            }
+            response_builder.finish()
         }
 
         struct WsProxy;
