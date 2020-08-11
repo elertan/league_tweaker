@@ -101,15 +101,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         //             .as_ref(),
         //     )
         //     .unwrap();
-        builder
-            .set_serial_number(
-                openssl::asn1::Asn1Integer::from_bn(
-                    openssl::bn::BigNum::from_u32(97).unwrap().as_ref(),
-                )
-                .unwrap()
-                .as_ref(),
-            )
-            .unwrap();
+        // builder
+        //     .set_serial_number(
+        //         openssl::asn1::Asn1Integer::from_bn(
+        //             openssl::bn::BigNum::from_u32(97).unwrap().as_ref(),
+        //         )
+        //         .unwrap()
+        //         .as_ref(),
+        //     )
+        //     .unwrap();
         builder.set_pubkey(&pkey).unwrap();
         builder
             .sign(&pkey, openssl::hash::MessageDigest::sha256())
