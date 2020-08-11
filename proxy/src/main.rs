@@ -185,7 +185,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     APP_DATA
         .set(AppData {
             app_port,
-            remoting_auth_token,
+            remoting_auth_token: remoting_auth_token.clone(),
         })
         .unwrap_or_else(|_| panic!());
 
@@ -287,16 +287,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .run()
         .await
     };
-
-    proxy_fut.await?;
     // futures::future::try_join(http_proxy_fut, fut2).await?;
 
-    // let ws_conn_string = format!("wss://127.0.0.1:{}", app_port);
-    // info!("Ws conn string: {}", &ws_conn_string);
+    let ws_conn_string = format!("wss://127.0.0.1:{}", app_port);
+    info!("Ws conn string: {}", &ws_conn_string);
     //
-    // let auth_header_data = format!("riot:{}", &remoting_auth_token);
-    // let auth_header = format!("Basic {}", base64::encode(auth_header_data));
-    // info!("Auth header: {}", &auth_header);
+    let auth_header_data = format!("riot:{}", &remoting_auth_token);
+    let auth_header = format!("Basic {}", base64::encode(auth_header_data));
+    info!("Auth header: {}", &auth_header);
     //
     // let tungstenite_req = tungstenite::http::Request::builder()
     //     .uri(ws_conn_string)
@@ -314,6 +312,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //
     // ws.write_message(tungstenite::Message::Text("Hello, world!".to_string()))?;
 
+    proxy_fut.await?;
     info!("Finished");
     Ok(())
 }
