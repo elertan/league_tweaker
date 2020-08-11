@@ -50,7 +50,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     .as_ref(),
             )
             .unwrap();
-        // builder.set_issuer_name(&name).unwrap();
+        builder.set_issuer_name(&name).unwrap();
         // builder
         //     .set_not_before(
         //         openssl::asn1::Asn1Time::from_str_x509("19700101000000Z")

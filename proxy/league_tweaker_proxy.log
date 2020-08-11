@@ -1,0 +1,76 @@
+[00:00:00.000] (11265ddc0) INFO   Starting...
+[00:00:00.000] (11265ddc0) INFO   Generating self-signed SSL certificate...
+[00:00:00.019] (11265ddc0) INFO   Generated SSL certificate
+[00:00:00.019] (11265ddc0) INFO   Public key: -----BEGIN CERTIFICATE-----
+MIICpTCCAY2gAwIBAgIBADANBgkqhkiG9w0BAQsFADAUMRIwEAYDVQQDDAlsb2Nh
+bGhvc3QwIhgPMTk3MDAxMDEwMTAxMDFaGA8yMDQwMDEwMTAxMDEwMVowFDESMBAG
+A1UEAwwJbG9jYWxob3N0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+sLb76ake4GzNFOmcD45L3FQ+ybHNQqkPaotBFKvR9xPQu8rtJjUni/CYDtD2ranw
+OiqSOxNOgwXaQHFaJ4PJc3kB/tITBxy0ur2jNQvbROclmMJLshOm6Nw4juO0qzlC
+UA4WWlVzmm2GAdUI/2VMQpYAh1wuvferq8UcFloBl5BymnAlyOAL+CGD2ph079/t
+2tY9gsfblhjK4UJglK2cLjezErAfan1Zp3UKs98EGYIOBgHoIs/0x65m4o8CsI8B
+lac95tAZmh5siGYS44z3ZfJQYO6Lhz8T5U2kX944lX0T8iWsdTgQbMFAG07MQBVd
+jWYjlrFOcn0kMl0vzuJ+LwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQCnpFfcAtXg
+EhZBGh06xLPD/sMRkuGTBJlfnls4kwZOC/aAlFeiB7BbDBVN5b2tnuG7XWU7M+eT
+6ho3wA2BVUuKl/+2nTTqssHiQK6WwPG1Zwgsp4k1SFYwWnU1y4kX0drsD7Ik2doq
+2rirdeb79snjMbRrsvMm/5BedvrpeCWBa/3/AA+9Rk7rjfd6MzKgECW3xuIVSyHv
+DRVRu1N+nBUVxNF5hTidv7BxG3JYqTuw08VOsQ2yyGb6+wRizCxTJrtAE3NZW5OO
+WmfbgdyGkj2U6hqRAuAnZ1XZrkK5dFN34GwApgl/hIsQowM00XZF98jEevBr9uyB
+Q3IiUsAUc7Dq
+-----END CERTIFICATE-----
+
+[00:00:00.019] (11265ddc0) INFO   Private key: -----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAsLb76ake4GzNFOmcD45L3FQ+ybHNQqkPaotBFKvR9xPQu8rt
+JjUni/CYDtD2ranwOiqSOxNOgwXaQHFaJ4PJc3kB/tITBxy0ur2jNQvbROclmMJL
+shOm6Nw4juO0qzlCUA4WWlVzmm2GAdUI/2VMQpYAh1wuvferq8UcFloBl5BymnAl
+yOAL+CGD2ph079/t2tY9gsfblhjK4UJglK2cLjezErAfan1Zp3UKs98EGYIOBgHo
+Is/0x65m4o8CsI8Blac95tAZmh5siGYS44z3ZfJQYO6Lhz8T5U2kX944lX0T8iWs
+dTgQbMFAG07MQBVdjWYjlrFOcn0kMl0vzuJ+LwIDAQABAoIBAFf6geiO3mR1RpUG
+yT+lZHdJKglYkAyEBrzQn5IfCOWt49na6b5/8DRnkAywVF+Zn5QV5b+rmQb6PvKe
+fHf30K/AqxGmnPqJfCEMkNi0EnJ3cexfrzf1OL/uA+p/y08DrtQUb2SB7pAPvwvi
+eBxO3my4KYM6jbreN4XJGHa4UNqXp3HPKPfWV/9Cg0D2o5pae1M8gsaIEryYFSi+
+BGQG4S9Ojglpq198dU1oBaNwTkqUF8FuU3qDFcjXcoOTKVISxWzwnXNV87DnDwMK
+ZsyLMmSbgexVh7CxHvM9vLLXY4fWXEXPw3DCl0nckBhv+CZL0lk0L3deZQQGl9ls
+MXtkFYECgYEA45GGnzGJiEozljK1ocO6g+jtOeHeGtMamxje4lCBK3oUtWjMA2wG
+xYDF7/pu8jGKUCaH1HvdJ4vC2eM5QT8jgQ1FhGiNZzVW0mZo1zrFiIXqtt12hrVL
+IKRRFFd4MJe9UXkwtvacLWt+dwIs9SWJdP9yGWb433R451QpRx1l5b8CgYEAxsr4
+kX1DXxKvG+uJB9PAkEhn8nAGlcKgJWtncFDTvUOAUQ0pRhIseYXUhY9eKt1/hbcB
+ph13TZBthG/tja5V8fUEdrVQGwF9gUKWDyIwO6BeKyMPqqLe1N8IDLedf+p24oux
+YRM6YEFZLa0jl9jUFjXWmKRsWwNS0xJ0+g1N45ECgYBb+PnWpxe1rH+S6aW83jUo
+kOAnr6CraLxtCK0z/GNoJevusY8apvNJqVTWO3nRirIi2J+3AeSM0hCLLSl7tD/u
+LWX2MKdNmiIf4OHocslY9v64r2Ly6JyXcbGPLhbWVM1f+0H0AFF4jeRLxuZSobwf
+PApqN9LHxPQEUmBobHo9UwKBgEP+iKa6waBzM5HJLkWPF/5BxcwWpSn0N/KUmfzA
+qKvDus/+QG/HJ48pR1engf4HZObHgbjfuz68d7kkz4v2ZU8tDynLOmsCR3s+2zSx
+7O14HL2EcIdczfrhjk9LPoPSHne+cB1UBlOGBoqo/dOiRmiSYaQ0GRvINzwaxAgD
+JPEBAoGBAIGP/JJZfP6BTP2RnMB3r1zVk+mG/MJkAlejUT6nPDHDJ1c1xi/PuoQJ
+mS0VpElpPlgbNQLaFndwOIkiJ0i/pbPt/2YFXigRii/+/0xIwNl61IWG0utRgDaQ
+oYnmi3pHYEgQNeo5QNEWC3mbDz6SF5oJ25p1jd8rwwPoLVaH4NqF
+-----END RSA PRIVATE KEY-----
+
+[00:00:00.020] (11265ddc0) INFO   LCU remoting auth token: '1'
+[00:00:00.020] (11265ddc0) INFO   LCU app port: 80
+[00:00:00.020] (11265ddc0) INFO   Running proxy server on 127.0.0.1:8080
+[00:00:00.021] (11265ddc0) INFO   Starting 12 workers
+[00:00:00.021] (11265ddc0) INFO   Starting "actix-web-service-127.0.0.1:8080" service on 127.0.0.1:8080
+[00:00:03.056] (700004a5a000) ERROR  TLS alert received: Message {
+    typ: Alert,
+    version: TLSv1_3,
+    payload: Alert(
+        AlertMessagePayload {
+            level: Fatal,
+            description: BadCertificate,
+        },
+    ),
+}
+[00:00:43.731] (70000607b000) ERROR  TLS alert received: Message {
+    typ: Alert,
+    version: TLSv1_3,
+    payload: Alert(
+        AlertMessagePayload {
+            level: Fatal,
+            description: BadCertificate,
+        },
+    ),
+}
+[00:02:31.151] (11265ddc0) INFO   SIGINT received, exiting
+[00:02:31.152] (11265ddc0) INFO   Finished
