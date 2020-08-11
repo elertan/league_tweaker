@@ -11,6 +11,7 @@ use std::str::FromStr;
 use std::sync::Mutex;
 
 struct AppData {
+    pub args: Vec<String>,
     pub remoting_auth_token: String,
     pub app_port: u32,
 }
@@ -22,6 +23,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     simple_logging::log_to_file("league_tweaker_proxy.log", log::LevelFilter::Info)?;
     // simple_logging::log_to(std::io::stdout(), log::LevelFilter::Info);
     info!("Starting...");
+
+    let args = env::args().collect::<Vec<String>>();
+
+    let proxy_port: u32 = 8080;
 
     info!("Generating self-signed SSL certificate...");
     let rsa = openssl::rsa::Rsa::generate(2048).unwrap();
@@ -141,8 +146,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::str::from_utf8(private_key_pem.as_slice()).unwrap()
     );
 
-    let args = env::args().collect::<Vec<String>>();
-
     let remoting_auth_token_arg = args
         .iter()
         .find(|s| s.starts_with("--remoting-auth-token"))
@@ -184,6 +187,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     APP_DATA
         .set(AppData {
+            args,
             app_port,
             remoting_auth_token: remoting_auth_token.clone(),
         })
@@ -223,7 +227,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let header_value = header.1.to_str().unwrap();
                 response_builder.set_header(header_name, header_value);
             }
-            response_builder.body(res.text().await.unwrap());
+            let response_text = res.text().await.unwrap();
+            log!("Response text: {}", &response_text);
+            response_builder.body(response_text);
             response_builder.finish()
         }
 
@@ -275,15 +281,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 panic!();
             });
 
-        let addr = "127.0.0.1:8080";
-        info!("Running proxy server on {}", addr);
+        let addr = format!("127.0.0.1:{}", proxy_port);
+        info!("Running proxy server on {}", &addr);
 
         HttpServer::new(|| {
             App::new()
                 .route("wamp", web::get().to(proxy_ws))
                 .route("*", web::to(proxy_http))
         })
-        .bind_rustls(addr, rustls_config)
+        .bind_rustls(&addr, rustls_config)
         .expect("Bind failed")
         .run()
         .await;
@@ -314,6 +320,38 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         ()
     };
+
+    let launcher_fut = async move {
+        log!("Waiting for delay (3s)...");
+        tokio::timer::Delay(std::time::Duration::from_secs(3)).await;
+        log!("Launching client with args:\n{}", &args);
+        let app_data = APP_DATA.get().unwrap();
+        let mut passthru_args: Vec<String> = args
+            .into_iter()
+            .enumerate()
+            .filter_map(|(i, arg)| {
+                if i == 0 || arg.starts_with("--app-port") {
+                    return None;
+                }
+                Some(arg)
+            })
+            .collect();
+        let app_port_arg = format!("--app-port={}", proxy_port);
+        passthru_args.push(app_port_arg);
+        let string_args = passthru_args.join(" ");
+        info!("Passing thru args to league client: '{}'", string_args);
+
+        let result = std::process::Command::new(
+            "C:\\Riot Games\\League of Legends\\original_LeagueClientUx.exe",
+        )
+        .args(passthru_args.as_slice())
+        .status()
+        .unwrap_or_else(|err| {
+            error!("Failed to LeagueClientUx: {}", err);
+            panic!();
+        });
+    };
+
     // let tungstenite_req = tungstenite::http::Request::builder()
     //     .uri(ws_conn_string)
     //     .header(tungstenite::http::header::AUTHORIZATION, auth_header)
@@ -330,7 +368,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //
     // ws.write_message(tungstenite::Message::Text("Hello, world!".to_string()))?;
 
-    futures::future::join(proxy_fut, websocket_fut).await;
+    futures::future::join3(proxy_fut, websocket_fut, launcher_fut).await;
     // proxy_fut.await?;
     info!("Finished");
     Ok(())

@@ -6,6 +6,12 @@ fn main() {
     println!("Status: {}", result);
 
     std::fs::copy(
+        "C:\\Riot Games\\League of Legends\\LeagueClientUx.exe",
+        "C:\\Riot Games\\League of Legends\\original_LeagueClientUx.exe",
+    )
+    .expect("Failed to copy over proxy");
+
+    std::fs::copy(
         "..\\..\\..\\proxy\\target\\release\\proxy.exe",
         "C:\\Riot Games\\League of Legends\\LeagueClientUx.exe",
     )
