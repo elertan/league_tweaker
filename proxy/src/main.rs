@@ -304,12 +304,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .body(())
             .unwrap();
 
-        let (ws_stream, _) = async_tungstenite::async_std::connect_async(req)
-            .await
-            .unwrap_or_else(|err| {
-                error!("Couldnt connect ws: '{}'", err);
-                panic!();
-            });
+        // let (ws_stream, _) = async_tungstenite::async_std::connect_async(req)
+        //     .await
+        //     .unwrap_or_else(|err| {
+        //         error!("Couldnt connect ws: '{}'", err);
+        //         panic!();
+        //     });
 
         ()
     };
