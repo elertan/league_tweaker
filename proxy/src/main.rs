@@ -290,14 +290,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         ()
     };
     let websocket_fut = async move {
-        let ws_conn_string = format!("wss://127.0.0.1:{}", app_port);
+        let ws_conn_string = format!("wss://127.0.0.1:{}/wamp", app_port);
         info!("Ws conn string: {}", &ws_conn_string);
         //
         let auth_header_data = format!("riot:{}", &remoting_auth_token);
         let auth_header = format!("Basic {}", base64::encode(auth_header_data));
         info!("Auth header: {}", &auth_header);
 
-        let (ws_stream, _) = async_tungstenite::async_std::connect_async(ws_conn_string)
+        let req = http::request::Builder::new()
+            .uri(ws_conn_string)
+            .header("Authorization", auth_header)
+            .method("GET")
+            .body(())
+            .unwrap();
+
+        let (ws_stream, _) = async_tungstenite::async_std::connect_async(req)
             .await
             .unwrap_or_else(|err| {
                 error!("Couldnt connect ws: '{}'", err);
