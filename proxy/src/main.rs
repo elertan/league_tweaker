@@ -19,38 +19,81 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pkey = openssl::pkey::PKey::from_rsa(rsa).unwrap();
 
     let (public_key_pem, private_key_pem) = {
-        let mut name = openssl::x509::X509Name::builder().unwrap();
-        // name.append_entry_by_nid(openssl::nid::Nid::COUNTRYNAME, "US")
-        //     .unwrap();
-        // name.append_entry_by_nid(openssl::nid::Nid::STATEORPROVINCENAME, "Massachusetts")
-        //     .unwrap();
-        // name.append_entry_by_nid(openssl::nid::Nid::LOCALITYNAME, "Boston")
-        //     .unwrap();
-        // name.append_entry_by_nid(openssl::nid::Nid::ORGANIZATIONNAME, "Riot Games")
-        //     .unwrap();
+        let mut subject_name = openssl::x509::X509Name::builder().unwrap();
+        subject_name
+            .append_entry_by_nid(openssl::nid::Nid::COMMONNAME, "rclient")
+            .unwrap();
+        subject_name
+            .append_entry_by_nid(openssl::nid::Nid::SUBJECT_ALT_NAME, "127.0.0.1")
+            .unwrap();
+        subject_name
+            .append_entry_by_nid(openssl::nid::Nid::SUBJECT_ALT_NAME, "localhost")
+            .unwrap();
+        let subject_name = subject_name.build();
+
+        let mut issuer_name = openssl::x509::X509Name::builder().unwrap();
+        issuer_name
+            .append_entry_by_nid(openssl::nid::Nid::COUNTRYNAME, "US")
+            .unwrap();
+        issuer_name
+            .append_entry_by_nid(openssl::nid::Nid::STATEORPROVINCENAME, "California")
+            .unwrap();
+        issuer_name
+            .append_entry_by_nid(openssl::nid::Nid::LOCALITYNAME, "Santa Monica")
+            .unwrap();
+        issuer_name
+            .append_entry_by_nid(openssl::nid::Nid::ORGANIZATIONNAME, "Riot Games")
+            .unwrap();
+        issuer_name
+            .append_entry_by_nid(
+                openssl::nid::Nid::ORGANIZATIONALUNITNAME,
+                "LoL Game Engineering",
+            )
+            .unwrap();
         // name.append_entry_by_nid(openssl::nid::Nid::EMAIL_PROTECT, "admin@riotgames.com")
         //     .unwrap();
-        name.append_entry_by_nid(openssl::nid::Nid::COMMONNAME, "localhost")
+        issuer_name
+            .append_entry_by_nid(
+                openssl::nid::Nid::COMMONNAME,
+                "LoL Game Engineering Certificate Authority",
+            )
             .unwrap();
-        let name = name.build();
+        let issuer_name = issuer_name.build();
         let mut builder = openssl::x509::X509::builder().unwrap();
         builder.set_version(2).unwrap();
-        builder.set_subject_name(&name).unwrap();
+        builder.set_subject_name(&subject_name).unwrap();
+
+        let time_now = chrono::Utc::now();
+        let set_not_before_time = time_now - chrono::Duration::days(365 * 4);
+        let set_not_after_time = time_now + chrono::Duration::days(365 * 5);
+
         builder
             .set_not_before(
-                openssl::asn1::Asn1Time::from_str("19700101010101Z")
-                    .unwrap()
-                    .as_ref(),
+                openssl::asn1::Asn1Time::from_str(
+                    set_not_before_time
+                        .format("%Y%m%d%H%M%SZ")
+                        .to_string()
+                        .as_str(),
+                )
+                // openssl::asn1::Asn1Time::from_str("19700101010101Z")
+                .unwrap()
+                .as_ref(),
             )
             .unwrap();
         builder
             .set_not_after(
-                openssl::asn1::Asn1Time::from_str("20400101010101Z")
-                    .unwrap()
-                    .as_ref(),
+                openssl::asn1::Asn1Time::from_str(
+                    set_not_after_time
+                        .format("%Y%m%d%H%M%SZ")
+                        .to_string()
+                        .as_str(),
+                )
+                // openssl::asn1::Asn1Time::from_str("20400101010101Z")
+                .unwrap()
+                .as_ref(),
             )
             .unwrap();
-        builder.set_issuer_name(&name).unwrap();
+        builder.set_issuer_name(&issuer_name).unwrap();
         // builder
         //     .set_not_before(
         //         openssl::asn1::Asn1Time::from_str_x509("19700101000000Z")
@@ -58,6 +101,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         //             .as_ref(),
         //     )
         //     .unwrap();
+        builder
+            .set_serial_number(
+                openssl::asn1::Asn1Integer::from_bn(
+                    openssl::bn::BigNum::from_u32(97).unwrap().as_ref(),
+                )
+                .unwrap()
+                .as_ref(),
+            )
+            .unwrap();
         builder.set_pubkey(&pkey).unwrap();
         builder
             .sign(&pkey, openssl::hash::MessageDigest::sha256())
