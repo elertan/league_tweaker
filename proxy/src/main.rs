@@ -223,6 +223,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let header_value = header.1.to_str().unwrap();
                 response_builder.set_header(header_name, header_value);
             }
+            response_builder.body(res.text().await.unwrap());
             response_builder.finish()
         }
 
