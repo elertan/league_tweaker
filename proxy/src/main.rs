@@ -12,6 +12,7 @@ struct AppData {
     pub args: Vec<String>,
     pub remoting_auth_token: String,
     pub app_port: u32,
+    pub auth_header: String,
 }
 
 static APP_DATA: OnceCell<AppData> = OnceCell::new();
@@ -201,11 +202,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         });
     info!("LCU app port: {}", &app_port);
 
+    let auth_header_data = format!("riot:{}", &remoting_auth_token);
+    let auth_header = format!("Basic {}", base64::encode(auth_header_data));
+    info!("Auth header: {}", &auth_header);
+
     APP_DATA
         .set(AppData {
             args,
             app_port,
             remoting_auth_token: remoting_auth_token.clone(),
+            auth_header,
         })
         .unwrap_or_else(|_| panic!());
 
@@ -228,11 +234,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .unwrap();
             let request_method = reqwest::Method::from_str(req.method().as_str()).unwrap();
             let path = req.uri().path_and_query().unwrap().as_str();
-            let port = APP_DATA.get().unwrap().app_port;
+            let app_data = APP_DATA.get().unwrap();
+            let port = app_data.app_port;
             let url = format!("https://127.0.0.1:{}{}", port, path);
             info!("url: {}", &url);
             let res = client
                 .request(request_method, url.as_str())
+                .header("Authorization", app_data.auth_header.clone())
                 .send()
                 .await
                 .unwrap();
@@ -325,10 +333,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let ws_conn_string = format!("wss://127.0.0.1:{}/wamp", app_port);
         info!("Ws conn string: {}", &ws_conn_string);
         //
-        let auth_header_data = format!("riot:{}", &remoting_auth_token);
-        let auth_header = format!("Basic {}", base64::encode(auth_header_data));
-        info!("Auth header: {}", &auth_header);
-
         let req = http::request::Builder::new()
             .uri(ws_conn_string)
             .header("Authorization", auth_header)
