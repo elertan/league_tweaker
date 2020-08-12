@@ -244,8 +244,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let header_value = header.1.to_str().unwrap();
                 response_builder.set_header(header_name, header_value);
             }
+            info!("Response: {:?}", res);
             let response_text = res.text().await.unwrap();
-            info!("Response text: {}", response_text.as_str());
+            // info!("Response text: {}", response_text.as_str());
             response_builder.body(response_text);
             response_builder.finish()
         }
