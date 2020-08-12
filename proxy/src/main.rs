@@ -326,6 +326,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .route("wamp", web::get().to(proxy_ws))
                 .route("*", web::to(proxy_http))
         })
+        .workers(2)
         .bind_openssl(&addr, ssl_builder)
         // .bind_rustls(&addr, rustls_config)
         .expect("Bind failed")
