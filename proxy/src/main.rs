@@ -240,7 +240,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             info!("url: {}", &url);
             let proxy_req = client
                 .request(request_method, url.as_str())
-                .header("Authorization", app_data.auth_header.clone());
+                .header("Authorization", app_data.auth_header.clone())
+                .header("Host", format!("https://127.0.0.1:{}", port))
+                .header("Accept", "application/json")
+                .header("Accept-Encoding", "gzip, deflate, br")
+                .header("Connection", "keep-alive");
             info!("Proxy req: {:?}", &proxy_req);
             let res = proxy_req.send().await.unwrap();
             let mut response_builder = HttpResponse::build(
