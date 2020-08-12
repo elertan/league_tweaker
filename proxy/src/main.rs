@@ -332,10 +332,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let websocket_fut = async move {
         let ws_conn_string = format!("wss://127.0.0.1:{}/wamp", app_port);
         info!("Ws conn string: {}", &ws_conn_string);
+        let app_data = APP_DATA.get().unwrap();
         //
         let req = http::request::Builder::new()
             .uri(ws_conn_string)
-            .header("Authorization", auth_header)
+            .header("Authorization", app_data.auth_header.clone())
             .method("GET")
             .body(())
             .unwrap();
