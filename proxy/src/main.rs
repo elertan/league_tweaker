@@ -241,7 +241,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let proxy_req = client
                 .request(request_method, url.as_str())
                 .header("Authorization", app_data.auth_header.clone())
-                .header("Host", format!("https://127.0.0.1:{}", port))
+                .header("Host", format!("127.0.0.1:{}", port))
                 .header("User-Agent", "PostmanRuntime/7.26.3")
                 .header("Accept", "application/json")
                 .header("Accept-Encoding", "gzip, deflate, br")
