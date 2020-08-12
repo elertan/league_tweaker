@@ -258,9 +258,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             info!("Response: {:?}", res);
             let response_text = res.text().await.unwrap();
-            // info!("Response text: {}", response_text.as_str());
-            response_builder.body(response_text);
-            response_builder.finish()
+            info!("Response text: {}", response_text.as_str());
+            response_builder.body(response_text)
         }
 
         struct WsProxy;
