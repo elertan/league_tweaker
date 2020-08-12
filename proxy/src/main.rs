@@ -274,6 +274,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 msg: Result<ws::Message, ws::ProtocolError>,
                 ctx: &mut Self::Context,
             ) {
+                info!("ws msg from client: {:?}", &msg);
                 match msg {
                     Ok(ws::Message::Ping(msg)) => ctx.pong(&msg),
                     Ok(ws::Message::Text(text)) => ctx.text(text),
@@ -284,6 +285,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         async fn proxy_ws(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
+            info!("ws req: {:?}", &req);
             let resp = ws::start(WsProxy, &req, stream);
             info!("{:?}", resp);
             resp
