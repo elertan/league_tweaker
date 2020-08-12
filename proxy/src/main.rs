@@ -8,8 +8,6 @@ use std::env;
 use std::io::BufReader;
 use std::str::FromStr;
 
-mod client_cert_verifier;
-
 struct AppData {
     pub args: Vec<String>,
     pub remoting_auth_token: String,
@@ -32,7 +30,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let rsa = openssl::rsa::Rsa::generate(2048).unwrap();
     let pkey = openssl::pkey::PKey::from_rsa(rsa).unwrap();
 
-    let (public_key_pem, private_key_pem) = {
+    let (public_key_pem, private_key_pem, cert) = {
         let mut subject_name = openssl::x509::X509Name::builder().unwrap();
         subject_name
             .append_entry_by_nid(openssl::nid::Nid::COMMONNAME, "rclient")
@@ -151,7 +149,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let cert_pem = cert.to_pem().unwrap();
         let pkey_pem = pkey.rsa().unwrap().private_key_to_pem().unwrap();
-        (cert_pem, pkey_pem)
+        (cert_pem, pkey_pem, cert)
     };
     // rcgen::generate_simple_self_signed();
     info!("Generated SSL certificate");
@@ -278,27 +276,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             resp
         }
 
-        let mut rustls_config =
-            rustls::ServerConfig::new(client_cert_verifier::AllowAllClientCertVerifier::new());
-        let mut public_cert_reader = BufReader::new(public_key_pem.as_slice());
-        let mut private_key_reader = BufReader::new(private_key_pem.as_slice());
-
-        let cert_chain =
-            rustls::internal::pemfile::certs(&mut public_cert_reader).unwrap_or_else(|_| {
-                error!("Failed to create cert_chain");
-                panic!();
-            });
-        let mut keys = rustls::internal::pemfile::rsa_private_keys(&mut private_key_reader)
-            .unwrap_or_else(|_| {
-                error!("Failed to create keys");
-                panic!();
-            });
-        rustls_config
-            .set_single_cert(cert_chain, keys.remove(0))
-            .unwrap_or_else(|_| {
-                error!("Failed to set certificate");
-                panic!();
-            });
+        let mut ssl_builder =
+            openssl::ssl::SslAcceptor::mozilla_intermediate(openssl::ssl::SslMethod::tls())
+                .unwrap();
+        ssl_builder.set_private_key(pkey.as_ref()).unwrap();
+        ssl_builder.set_certificate(cert.as_ref()).unwrap();
+        // let mut rustls_config =
+        //     rustls::ServerConfig::new(client_cert_verifier::AllowAllClientCertVerifier::new());
+        // let mut public_cert_reader = BufReader::new(public_key_pem.as_slice());
+        // let mut private_key_reader = BufReader::new(private_key_pem.as_slice());
+        //
+        // let cert_chain =
+        //     rustls::internal::pemfile::certs(&mut public_cert_reader).unwrap_or_else(|_| {
+        //         error!("Failed to create cert_chain");
+        //         panic!();
+        //     });
+        // let mut keys = rustls::internal::pemfile::rsa_private_keys(&mut private_key_reader)
+        //     .unwrap_or_else(|_| {
+        //         error!("Failed to create keys");
+        //         panic!();
+        //     });
+        // rustls_config
+        //     .set_single_cert(cert_chain, keys.remove(0))
+        //     .unwrap_or_else(|_| {
+        //         error!("Failed to set certificate");
+        //         panic!();
+        //     });
 
         let addr = format!("0.0.0.0:{}", proxy_port);
         info!("Running proxy server on {}", &addr);
@@ -308,7 +311,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .route("wamp", web::get().to(proxy_ws))
                 .route("*", web::to(proxy_http))
         })
-        .bind_rustls(&addr, rustls_config)
+        .bind_openssl(&addr, ssl_builder)
+        // .bind_rustls(&addr, rustls_config)
         .expect("Bind failed")
         .run()
         .await;

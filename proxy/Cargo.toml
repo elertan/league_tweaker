@@ -13,7 +13,7 @@ base64 = "0.12.3"
 async-tungstenite = { version = "0.8.0", features = ["async-tls", "async-std-runtime"]}
 log = "0.4.11"
 simple-logging = "2.0.2"
-actix-web = { version = "2.0", features = ["rustls"] }
+actix-web = { version = "2.0", features = ["openssl"] }
 actix-rt = "1.0"
 actix-web-actors = "2.0"
 actix = "0.9"
