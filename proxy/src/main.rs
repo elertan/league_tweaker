@@ -47,6 +47,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let mut issuer_name = openssl::x509::X509Name::builder().unwrap();
         issuer_name
+            .append_entry_by_nid(
+                openssl::nid::Nid::EMAIL_PROTECT,
+                "gametechnologies@riotgames.com",
+            )
+            .unwrap();
+        issuer_name
             .append_entry_by_nid(openssl::nid::Nid::COUNTRYNAME, "US")
             .unwrap();
         issuer_name
@@ -75,12 +81,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let issuer_name = issuer_name.build();
         let mut builder = openssl::x509::X509::builder().unwrap();
 
-        let mut subjectAltNameExt = openssl::x509::extension::SubjectAlternativeName::new();
-        subjectAltNameExt.ip("127.0.0.1");
-        subjectAltNameExt.dns("localhost");
+        let mut subject_alt_name_ext = openssl::x509::extension::SubjectAlternativeName::new();
+        subject_alt_name_ext.ip("127.0.0.1");
+        subject_alt_name_ext.dns("localhost");
+        let mut extended_key_usage_ext = openssl::x509::extension::ExtendedKeyUsage::new();
+        extended_key_usage_ext.other("TLS Web Server Authentication");
         let ctx = builder.x509v3_context(None, None);
         builder
-            .append_extension(subjectAltNameExt.build(&ctx).unwrap())
+            .append_extension(subject_alt_name_ext.build(&ctx).unwrap())
+            .unwrap();
+        builder
+            .append_extension(extended_key_usage_ext.build().unwrap())
             .unwrap();
         builder.set_version(2).unwrap();
         builder.set_subject_name(&subject_name).unwrap();
