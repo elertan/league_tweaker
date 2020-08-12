@@ -6,9 +6,9 @@ use actix_web_actors::ws;
 use once_cell::sync::OnceCell;
 use std::env;
 use std::io::BufReader;
-use std::net::IpAddr;
 use std::str::FromStr;
-use std::sync::Mutex;
+
+mod client_cert_verifier;
 
 struct AppData {
     pub args: Vec<String>,
@@ -260,7 +260,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             resp
         }
 
-        let mut rustls_config = rustls::ServerConfig::new(rustls::NoClientAuth::new());
+        let mut rustls_config =
+            rustls::ServerConfig::new(client_cert_verifier::AllowAllClientCertVerifier::new());
+        // rustls_config.
         let mut public_cert_reader = BufReader::new(public_key_pem.as_slice());
         let mut private_key_reader = BufReader::new(private_key_pem.as_slice());
 
