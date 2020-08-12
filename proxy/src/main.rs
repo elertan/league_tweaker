@@ -378,15 +378,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let string_args = passthru_args.join(" ");
         info!("Passing thru args to league client: '{}'", string_args);
 
-        let result = std::process::Command::new(
+        std::fs::copy(
             "C:\\Riot Games\\League of Legends\\original_LeagueClientUx.exe",
+            "C:\\Riot Games\\League of Legends\\LeagueClientUx.exe",
         )
-        .args(passthru_args.as_slice())
-        .status()
-        .unwrap_or_else(|err| {
-            error!("Failed to LeagueClientUx: {}", err);
-            panic!();
-        });
+        .expect("Failed to copy over original client");
+
+        let result =
+            std::process::Command::new("C:\\Riot Games\\League of Legends\\LeagueClientUx.exe")
+                .args(passthru_args.as_slice())
+                .status()
+                .unwrap_or_else(|err| {
+                    error!("Failed to LeagueClientUx: {}", err);
+                    panic!();
+                });
     };
 
     // let tungstenite_req = tungstenite::http::Request::builder()
