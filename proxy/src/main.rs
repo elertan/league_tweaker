@@ -37,12 +37,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         subject_name
             .append_entry_by_nid(openssl::nid::Nid::COMMONNAME, "rclient")
             .unwrap();
-        subject_name
-            .append_entry_by_nid(openssl::nid::Nid::SUBJECT_ALT_NAME, "127.0.0.1")
-            .unwrap();
-        subject_name
-            .append_entry_by_nid(openssl::nid::Nid::SUBJECT_ALT_NAME, "localhost")
-            .unwrap();
+        // subject_name
+        //     .append_entry_by_nid(openssl::nid::Nid::SUBJECT_ALT_NAME, "127.0.0.1")
+        //     .unwrap();
+        // subject_name
+        //     .append_entry_by_nid(openssl::nid::Nid::SUBJECT_ALT_NAME, "localhost")
+        //     .unwrap();
         let subject_name = subject_name.build();
 
         let mut issuer_name = openssl::x509::X509Name::builder().unwrap();
@@ -74,6 +74,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .unwrap();
         let issuer_name = issuer_name.build();
         let mut builder = openssl::x509::X509::builder().unwrap();
+
+        let mut subjectAltNameExt = openssl::x509::extension::SubjectAlternativeName::new();
+        subjectAltNameExt.ip("127.0.0.1");
+        subjectAltNameExt.dns("localhost");
+        let ctx = builder.x509v3_context(None, None);
+        builder
+            .append_extension(subjectAltNameExt.build(&ctx).unwrap())
+            .unwrap();
         builder.set_version(2).unwrap();
         builder.set_subject_name(&subject_name).unwrap();
 
