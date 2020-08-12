@@ -8,6 +8,7 @@ use std::env;
 use std::io::BufReader;
 use std::str::FromStr;
 
+mod cert_resolver;
 mod client_cert_verifier;
 
 struct AppData {
@@ -280,7 +281,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let mut rustls_config =
             rustls::ServerConfig::new(client_cert_verifier::AllowAllClientCertVerifier::new());
-        // rustls_config.
         let mut public_cert_reader = BufReader::new(public_key_pem.as_slice());
         let mut private_key_reader = BufReader::new(private_key_pem.as_slice());
 
@@ -301,7 +301,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 panic!();
             });
 
-        let addr = format!("127.0.0.1:{}", proxy_port);
+        let addr = format!("0.0.0.0:{}", proxy_port);
         info!("Running proxy server on {}", &addr);
 
         HttpServer::new(|| {
