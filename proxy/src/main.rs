@@ -238,12 +238,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let port = app_data.app_port;
             let url = format!("https://127.0.0.1:{}{}", port, path);
             info!("url: {}", &url);
-            let res = client
+            let proxy_req = client
                 .request(request_method, url.as_str())
-                .header("Authorization", app_data.auth_header.clone())
-                .send()
-                .await
-                .unwrap();
+                .header("Authorization", app_data.auth_header.clone());
+            info!("Proxy req: {:?}", &proxy_req);
+            let res = proxy_req.send().await.unwrap();
             let mut response_builder = HttpResponse::build(
                 actix_web::http::StatusCode::from_u16(res.status().as_u16()).unwrap(),
             );
