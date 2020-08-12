@@ -211,6 +211,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let proxy_fut = async move {
         async fn proxy_http(req: HttpRequest) -> impl Responder {
+            info!("Proxing: {}", req.uri().to_string());
             let mut request_headers = http::HeaderMap::new();
 
             for header in req.headers() {
