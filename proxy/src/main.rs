@@ -47,10 +47,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let mut issuer_name = openssl::x509::X509Name::builder().unwrap();
         issuer_name
-            .append_entry_by_nid(
-                openssl::nid::Nid::EMAIL_PROTECT,
-                "gametechnologies@riotgames.com",
-            )
+            .append_entry_by_text("emailAddress", "gametechnologies@riotgames.com")
             .unwrap();
         issuer_name
             .append_entry_by_nid(openssl::nid::Nid::COUNTRYNAME, "US")
@@ -103,10 +100,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         builder
             .set_not_before(
                 openssl::asn1::Asn1Time::from_str(
-                    set_not_before_time
-                        .format("%Y%m%d%H%M%SZ")
-                        .to_string()
-                        .as_str(),
+                    "20160107200333Z",
+                    // set_not_before_time
+                    //     .format("%Y%m%d%H%M%SZ")
+                    //     .to_string()
+                    //     .as_str(),
                 )
                 // openssl::asn1::Asn1Time::from_str("19700101010101Z")
                 .unwrap()
@@ -116,10 +114,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         builder
             .set_not_after(
                 openssl::asn1::Asn1Time::from_str(
-                    set_not_after_time
-                        .format("%Y%m%d%H%M%SZ")
-                        .to_string()
-                        .as_str(),
+                    "20260104200333Z",
+                    // set_not_after_time
+                    //     .format("%Y%m%d%H%M%SZ")
+                    //     .to_string()
+                    //     .as_str(),
                 )
                 // openssl::asn1::Asn1Time::from_str("20400101010101Z")
                 .unwrap()
