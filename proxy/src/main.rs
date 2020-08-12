@@ -228,7 +228,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 response_builder.set_header(header_name, header_value);
             }
             let response_text = res.text().await.unwrap();
-            log!("Response text: {}", &response_text);
+            info!("Response text: {}", response_text.as_str());
             response_builder.body(response_text);
             response_builder.finish()
         }
@@ -322,12 +322,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
 
     let launcher_fut = async move {
-        log!("Waiting for delay (3s)...");
-        tokio::timer::Delay(std::time::Duration::from_secs(3)).await;
-        log!("Launching client with args:\n{}", &args);
+        info!("Waiting for delay (3s)...");
+        tokio::time::delay_for(std::time::Duration::from_secs(3)).await;
+        // info!("Launching client with args:\n{}", &args);
         let app_data = APP_DATA.get().unwrap();
-        let mut passthru_args: Vec<String> = args
-            .into_iter()
+        let mut passthru_args: Vec<String> = app_data
+            .args
+            .iter()
             .enumerate()
             .filter_map(|(i, arg)| {
                 if i == 0 || arg.starts_with("--app-port") {
@@ -335,6 +336,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 Some(arg)
             })
+            .cloned()
             .collect();
         let app_port_arg = format!("--app-port={}", proxy_port);
         passthru_args.push(app_port_arg);
