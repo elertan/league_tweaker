@@ -8,7 +8,6 @@ use std::env;
 use std::io::BufReader;
 use std::str::FromStr;
 
-mod cert_resolver;
 mod client_cert_verifier;
 
 struct AppData {
