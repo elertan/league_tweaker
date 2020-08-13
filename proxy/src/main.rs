@@ -22,6 +22,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     simple_logging::log_to_file("league_tweaker_proxy.log", log::LevelFilter::Info)?;
     // simple_logging::log_to(std::io::stdout(), log::LevelFilter::Info);
     info!("Starting...");
+    info!("Waiting for forwarder to die");
+    std::thread::sleep(std::time::Duration::from_secs(3));
+    info!("Starting to restore...");
+
+    std::fs::copy(
+        "C:\\Riot Games\\League of Legends\\LeagueClientUx.exe.bak",
+        "C:\\Riot Games\\League of Legends\\LeagueClientUx.exe",
+    )
+    .unwrap_or_else(|err| {
+        error!("Failed to restore backed up client");
+        panic!();
+    });
 
     let args = env::args().collect::<Vec<String>>();
 
